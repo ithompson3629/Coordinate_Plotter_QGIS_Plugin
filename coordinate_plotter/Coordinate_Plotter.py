@@ -25,7 +25,7 @@ from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
 from qgis.core import *
-from qgis.gui import QgsMapLayerComboBox, QgsMapToolZoom, QgsSpinBox
+from qgis.gui import QgsMapLayerComboBox, QgsMapToolZoom, QgsSpinBox, QgsProjectionSelectionWidget
 from qgis.utils import iface
 
 # Initialize Qt resources from file resources.py
@@ -67,7 +67,10 @@ class CoordinatePlotter:
         self.menu = self.tr(u'&Coordinate Plotter')
         self.dlg = CoordinatePlotterDialog()
         self.dlg.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.PointLayer)
-
+        self.dlg.doubleSpinBox.setMaximum(300)
+        self.dlg.doubleSpinBox_2.setMaximum(300)
+        self.dlg.doubleSpinBox.setMinimum(-300)
+        self.dlg.doubleSpinBox_2.setMinimum(-400)
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
@@ -207,6 +210,8 @@ class CoordinatePlotter:
             layer_provider = layer.dataProvider()
             parent = iface.mainWindow()
             canvas = iface.mapCanvas()
+            #coord = self.dlg.mQgsProjectionSelectionWidget()
+            
             
             #point_layers = []
             #point_layers.append
