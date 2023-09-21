@@ -67,13 +67,17 @@ class CoordinatePlotter:
         self.menu = self.tr(u'&Coordinate Plotter')
         self.dlg = CoordinatePlotterDialog()
         self.dlg.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.PointLayer)
-        self.dlg.doubleSpinBox.setMaximum(300)
-        self.dlg.doubleSpinBox_2.setMaximum(300)
-        self.dlg.doubleSpinBox.setMinimum(-300)
-        self.dlg.doubleSpinBox_2.setMinimum(-400)
+        # self.dlg.doubleSpinBox.setMaximum(300)
+        # self.dlg.doubleSpinBox_2.setMaximum(300)
+        # self.dlg.doubleSpinBox.setMinimum(-300)
+        # self.dlg.doubleSpinBox_2.setMinimum(-400)
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
+        
+        #self.dlg.buttonBox.setEnabled(False)
+        self.dlg.checkBox.setVisible(False)
+        self.dlg.label_7.setVisible(False)
 
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
@@ -197,42 +201,55 @@ class CoordinatePlotter:
         if self.first_start == True:
             self.first_start = False
            # self.dlg = CoordinatePlotterDialog()
-
+           
+           
+        layer = self.dlg.mMapLayerComboBox.currentLayer()
+                    
+        if layer == NULL:
+            self.dlg.checkBox.setVisible(True)
+            self.dlg.label_7.setVisible(True)
+            self.dlg.mMapLayerComboBox.setEnabled(False)
+            
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
         result = self.dlg.exec_()
+        
         # See if OK was pressed
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            layer = self.dlg.mMapLayerComboBox.currentLayer()
-            layer_provider = layer.dataProvider()
-            parent = iface.mainWindow()
-            canvas = iface.mapCanvas()
-            #coord = self.dlg.mQgsProjectionSelectionWidget()
             
-            
-            #point_layers = []
-            #point_layers.append
-            
-            x = self.dlg.doubleSpinBox.value()
-            y = self.dlg.doubleSpinBox_2.value()
+                # Do something useful here - delete the line containing pass and
+                # substitute with your code.
+        
+            if layer.isValid():
+                layer_provider = layer.dataProvider()
+                parent = iface.mainWindow()
+                canvas = iface.mapCanvas()
+                #coord = self.dlg.mQgsProjectionSelectionWidget()
+                
+                
+                #point_layers = []
+                #point_layers.append
+                
+                x = self.dlg.doubleSpinBox.value()
+                y = self.dlg.doubleSpinBox_2.value()
 
-            new_feature = QgsFeature()
-            new_feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x , y)))
-            layer_provider.addFeature(new_feature)
-           
-            scale=50    
-            rect = QgsRectangle(float(x)-scale,float(y)-scale,float(x)+scale,float(y)+scale)
-            canvas.setExtent(rect)
-            pt = QgsPoint(float(x),float(y))
-            canvas.refresh()
-           
-            QMessageBox.information(parent, "Coordinate plotting", "Coordinates successfully plotted")
+                new_feature = QgsFeature()
+                new_feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x , y)))
+                layer_provider.addFeature(new_feature)
+               
+                scale=50    
+                rect = QgsRectangle(float(x)-scale,float(y)-scale,float(x)+scale,float(y)+scale)
+                canvas.setExtent(rect)
+                pt = QgsPoint(float(x),float(y))
+                canvas.refresh()
+               
+                QMessageBox.information(parent, "Coordinate plotting", "Coordinates successfully plotted")
             
-            pass
+            #elif self.dlg.checkBox.isChecked()
+
+                
     
     def dontdonothing(self):
-            QMessageBox.warning(parent, "Coordinate plotting", "Error occured when plotting coordinates")
+            #QMessageBox.warning(parent, "Coordinate plotting", "Error occured when plotting coordinates")
             pass
