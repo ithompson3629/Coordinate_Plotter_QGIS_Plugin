@@ -200,12 +200,12 @@ class CoordinatePlotter:
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         if self.first_start == True:
             self.first_start = False
-           # self.dlg = CoordinatePlotterDialog()
            
            
         layer = self.dlg.mMapLayerComboBox.currentLayer()
+    
                     
-        if layer == NULL:
+        if layer == None:
             self.dlg.checkBox.setVisible(True)
             self.dlg.label_7.setVisible(True)
             self.dlg.mMapLayerComboBox.setEnabled(False)
@@ -217,37 +217,52 @@ class CoordinatePlotter:
         
         # See if OK was pressed
         if result:
-            
-                # Do something useful here - delete the line containing pass and
-                # substitute with your code.
+            if layer != None:
+                return self.plot(layer)
         
-            if layer.isValid():
-                layer_provider = layer.dataProvider()
+            if layer == None and self.dlg.checkBox.isChecked() == False:
                 parent = iface.mainWindow()
-                canvas = iface.mapCanvas()
-                #coord = self.dlg.mQgsProjectionSelectionWidget()
-                
-                
-                #point_layers = []
-                #point_layers.append
-                
-                x = self.dlg.doubleSpinBox.value()
-                y = self.dlg.doubleSpinBox_2.value()
-
-                new_feature = QgsFeature()
-                new_feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x , y)))
-                layer_provider.addFeature(new_feature)
-               
-                scale=50    
-                rect = QgsRectangle(float(x)-scale,float(y)-scale,float(x)+scale,float(y)+scale)
-                canvas.setExtent(rect)
-                pt = QgsPoint(float(x),float(y))
-                canvas.refresh()
-               
-                QMessageBox.information(parent, "Coordinate plotting", "Coordinates successfully plotted")
+                QMessageBox.warning(parent, "Error", "Temporary layer not confirmed")
+                pass
             
-            #elif self.dlg.checkBox.isChecked()
+            if layer == None and self.dlg.checkBox.isChecked():
+                layer = QgsVectorLayer("Point?crs=EPSG:27700", "Temporary_layer", "memory")
+                QgsProject.instance().addMapLayer(layer)    
+                # Do something useful here - delete the line containing pass and
+                return self.plot(layer)
+            
+            
+               
+                
 
+    def plot(self, layer):
+        if layer.isValid():
+            layer_provider = layer.dataProvider()
+            
+            parent = iface.mainWindow()
+            canvas = iface.mapCanvas()
+            
+            x = self.dlg.doubleSpinBox.value()
+            y = self.dlg.doubleSpinBox_2.value()
+
+            new_feature = QgsFeature()
+            new_feature.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x , y)))
+            layer_provider.addFeature(new_feature)
+           
+            scale=50    
+            rect = QgsRectangle(float(x)-scale,float(y)-scale,float(x)+scale,float(y)+scale)
+            canvas.setExtent(rect)
+            pt = QgsPoint(float(x),float(y))
+            canvas.refresh()
+            self.dlg.checkBox.setVisible(False)
+            self.dlg.checkBox.setChecked(False)
+            self.dlg.label_7.setVisible(False)
+            self.dlg.mMapLayerComboBox.setEnabled(True)
+            self.dlg.doubleSpinBox.clear()
+            self.dlg.doubleSpinBox_2.clear()
+           
+            QMessageBox.information(parent, "Coordinate plotting", "Coordinates successfully plotted")
+        
                 
     
     def dontdonothing(self):
