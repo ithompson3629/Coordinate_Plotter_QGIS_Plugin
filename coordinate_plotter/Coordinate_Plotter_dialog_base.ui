@@ -32,16 +32,6 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetFixedSize</enum>
    </property>
-   <item row="4" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="0" colspan="3">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -166,7 +156,17 @@
    <item row="0" column="1">
     <widget class="QLabel" name="label_6">
      <property name="text">
-      <string>This plugin plots a point layer from user inputed coordinates..</string>
+      <string>This plugin plots a point layer from user-inputted coordinates.</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>

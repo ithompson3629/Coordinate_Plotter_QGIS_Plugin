@@ -5,15 +5,15 @@
 [general]
 name=Coordinate Plotter
 qgisMinimumVersion=3.0
-description=This plugin plots cordinates for a vector layer from user input
-version=0.1
+description=This plugin plots coordinates from user-inputted values.
+version=1.0
 author=Isaac Thompson
 email=ithompson@pre-construct.com
 
-about=This plugin plots coordinates for a vector layer from user input
+about=This plugin plots coordinates from user-inputted values.
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/ithompson3629/Coordinate_Plotter_QGIS_Plugin/issues
+repository=https://github.com/ithompson3629/Coordinate_Plotter_QGIS_Plugin
 # End of mandatory metadata
 
 # Recommended items:
@@ -23,9 +23,9 @@ hasProcessingProvider=no
 # changelog=
 
 # Tags are comma separated with spaces allowed
-tags=python
+tags=python, coordinates, PCA, Pre-construct Archaeology, point
 
-homepage=http://homepage
+homepage=https://github.com/ithompson3629/Coordinate_Plotter_QGIS_Plugin
 category=Plugins
 icon=coordinate_plotter_icon.png
 # experimental flag
@@ -40,7 +40,7 @@ deprecated=False
 # plugin_dependencies=
 
 Category of the plugin: Raster, Vector, Database or Web
-# category=
+# category=Vector
 
 # If the plugin can run on QGIS Server.
 server=False
