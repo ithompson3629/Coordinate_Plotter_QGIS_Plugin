@@ -20,12 +20,11 @@ repository=https://github.com/ithompson3629/Coordinate_Plotter_QGIS_Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-changelog=
-<p>1.01
-	- Added option to always create a temporary layer
-	- Added feature when spinboxes are locked if an option isn't selected
-	- Added feature when existing layer is checked but there is no valid layer, Ok button is disabled
-	- Bug fixes for dialog to be cleared after closing or pressing ok
+changelog= 1.01
+ - Added option to always create a temporary layer
+ - Added feature when spinboxes are locked if an option isn't selected
+ - Added feature when existing layer is checked but there is no valid layer, Ok button is disabled
+ - Bug fixes for dialog to be cleared after closing or pressing ok
 
 # Tags are comma separated with spaces allowed
 tags=python, coordinates, PCA, Pre-construct Archaeology, point
