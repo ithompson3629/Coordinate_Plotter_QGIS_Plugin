@@ -6,7 +6,7 @@
 name=Coordinate Plotter
 qgisMinimumVersion=3.0
 description=This plugin plots coordinates from user-inputted values.
-version=1.0
+version=1.01
 author=Isaac Thompson
 email=ithompson@pre-construct.com
 
@@ -20,7 +20,12 @@ repository=https://github.com/ithompson3629/Coordinate_Plotter_QGIS_Plugin
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog=
+<p>1.01
+	- Added option to always create a temporary layer
+	- Added feature when spinboxes are locked if an option isn't selected
+	- Added feature when existing layer is checked but there is no valid layer, Ok button is disabled
+	- Bug fixes for dialog to be cleared after closing or pressing ok
 
 # Tags are comma separated with spaces allowed
 tags=python, coordinates, PCA, Pre-construct Archaeology, point

@@ -22,7 +22,7 @@
 from qgis.PyQt.QtCore import QSettings, QTranslator, QCoreApplication
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMessageBox
-from PyQt5.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox
+from PyQt5.QtWidgets import QDialog, QVBoxLayout, QDialogButtonBox, QCheckBox, QButtonGroup
 from qgis.core import *
 from qgis.gui import QgsMapLayerComboBox, QgsMapToolZoom, QgsSpinBox, QgsProjectionSelectionWidget
 from qgis.utils import iface
@@ -65,20 +65,20 @@ class CoordinatePlotter:
         self.actions = []
         self.menu = self.tr(u'&Coordinate Plotter')
         self.dlg = CoordinatePlotterDialog()
-        self.dlg.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.PointLayer)
         
+        self.dlg.mMapLayerComboBox.setFilters(QgsMapLayerProxyModel.PointLayer)
+        self.dlg.mMapLayerComboBox.setEnabled(False)
+        self.dlg.doubleSpinBox_2.setEnabled(False)
+        self.dlg.doubleSpinBox.setEnabled(False)
+       
         #Signal method to enable Ok button in dialog box
-        self.dlg.mMapLayerComboBox.layerChanged.connect(self.enable_ok)
-        self.dlg.checkBox.stateChanged.connect(self.enable_ok)
+        self.dlg.checkBox.stateChanged.connect(self.layer_type_check)
+        self.dlg.layer_checkBox.stateChanged.connect(self.layer_type_check)
         
         # Check if plugin was started the first time in current QGIS session
         # Must be set in initGui() to survive plugin reloads
         self.first_start = None
         
-       
-        self.dlg.checkBox.setVisible(False)
-        self.dlg.label_7.setVisible(False)
-
     # noinspection PyMethodMayBeStatic
     def tr(self, message):
         """Get the translation for a string using Qt translation API.
@@ -191,40 +191,21 @@ class CoordinatePlotter:
                 action)
             self.iface.removeToolBarIcon(action)
     
-    #Function to enable Ok button in dialog box
-    def enable_ok (self):
-        layer = self.dlg.mMapLayerComboBox.currentLayer()
-        #If there is a layer, Ok enabled
-        if layer != None:
-                self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-        
-        #If there is no layer        
-        if layer == None:        
-            #Enable Ok if button box is checked   
-            if self.dlg.checkBox.isChecked() == True:
-                    self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-            #Disable Ok if button box is unchecked    
-            if self.dlg.checkBox.isChecked() == False:
-                    self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
                     
         
     def run(self):
         """Run method that performs all the real work"""
+        # Connect the dialog's finished signal to a custom slot
+        self.dlg.finished.connect(self.on_dialog_finished)
         
-
+        
         # Create the dialog with elements (after translation) and keep reference
         # Only create GUI ONCE in callback, so that it will only load when the plugin is started
         if self.first_start == True:
             self.first_start = False
-       
-        layer = self.dlg.mMapLayerComboBox.currentLayer()   
-                             
-        if layer == None:
-            self.dlg.checkBox.setVisible(True)
-            self.dlg.label_7.setVisible(True)
-            self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-      
-            
+        
+        self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+    
         # show the dialog
         self.dlg.show()
         # Run the dialog event loop
@@ -232,23 +213,17 @@ class CoordinatePlotter:
         
         # See if OK was pressed
         if result:
-            # Layer is not equal to nothing
-            if layer != None:
-                return self.plot(layer)
+           
+            if self.dlg.layer_checkBox.isChecked() == True:
+                layer = self.dlg.mMapLayerComboBox.currentLayer()
+                self.plot(layer)
             
-            # Layer equal to none and box isn't checked 
-            #if layer == None and self.dlg.checkBox.isChecked() == False:
-                #parent = iface.mainWindow()
-                #QMessageBox.warning(parent, "Error", "Temporary layer not confirmed")
-                #pass
-                
-            # Layer equal to none and box is checked
-            if layer == None and self.dlg.checkBox.isChecked():
-                crs = QgsProject.instance().crs()
+            if self.dlg.checkBox.isChecked() == True:
+                crs = QgsProject.instance().crs().authid()
                 layer = QgsVectorLayer(f"Point?crs={crs}", "Plotted Coordinate Layer", "memory")
-                QgsProject.instance().addMapLayer(layer)    
-                return self.plot(layer) 
-        
+                QgsProject.instance().addMapLayer(layer)
+                self.plot(layer)
+    
 
     def plot(self, layer):
         if layer.isValid():
@@ -273,20 +248,53 @@ class CoordinatePlotter:
             pt = QgsPoint(float(x),float(y))
             canvas.refresh()
             
-            #Reset dialog box values 
-            self.dlg.checkBox.setVisible(False)
-            self.dlg.checkBox.setChecked(False)
-            self.dlg.label_7.setVisible(False)
-            self.dlg.doubleSpinBox.setValue(0)
-            self.dlg.doubleSpinBox_2.setValue(0)
-           
+    
             QMessageBox.information(parent, "Coordinate plotting", "Coordinates successfully plotted:\n X = {} Y = {}".format(x,y))
-        
-                
-    
+            self.clean_dialogue()
+
+    def layer_type_check(self):
+        if self.dlg.checkBox.isChecked() == True:
+            self.dlg.mMapLayerComboBox.setEnabled(False)
+            self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+            self.dlg.doubleSpinBox_2.setEnabled(True)
+            self.dlg.doubleSpinBox.setEnabled(True)
+
+        if self.dlg.layer_checkBox.isChecked() == True:
+            layer = self.dlg.mMapLayerComboBox.currentLayer()
+            if layer != None:
+                self.dlg.mMapLayerComboBox.setEnabled(True)
+                self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
+                self.dlg.doubleSpinBox_2.setEnabled(True)
+                self.dlg.doubleSpinBox.setEnabled(True)
+            if layer == None:
+                self.dlg.mMapLayerComboBox.setEnabled(False)
+                self.dlg.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
+                self.dlg.doubleSpinBox_2.setEnabled(False)
+                self.dlg.doubleSpinBox.setEnabled(False)
+             
+           
     def dontdonothing(self):
-            pass
+        pass
             
-            
-            
-    
+    def clean_dialogue(self):
+        #Reset dialog box values 
+                
+        self.dlg.doubleSpinBox.setValue(0)
+        self.dlg.doubleSpinBox_2.setValue(0)
+        self.dlg.doubleSpinBox_2.setEnabled(False)
+        self.dlg.doubleSpinBox.setEnabled(False)
+        self.dlg.mMapLayerComboBox.setEnabled(False)
+        
+        self.buttonGroup = QButtonGroup()
+        self.buttonGroup.addButton(self.dlg.layer_checkBox)
+        self.buttonGroup.addButton(self.dlg.checkBox)
+        
+        self.buttonGroup.setExclusive(False)
+        self.dlg.layer_checkBox.setChecked(False)
+        self.dlg.checkBox.setChecked(False)
+        self.buttonGroup.setExclusive(True)
+       
+    def on_dialog_finished(self, result):
+        #"Slot to handle when the dialog is closed using Cancel.
+        if result == QDialog.Rejected:
+            self.clean_dialogue()
